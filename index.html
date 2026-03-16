@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#030303">
+    <title>Vortex Visceral | Oráculo de Alexia Melusine</title>
+    
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/pombagiras/melusine/main/Al%C3%AA%20(3)%20(3)%20(1).png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --abyss: #030303;
+            --arterial: #8b0000;
+            --poison: #4b0082;
+            --bone: #e0d7c6;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--abyss);
+            color: var(--bone);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+        }
+
+        header { width: 100%; text-align: center; padding: 20px 0; border-bottom: 1px solid var(--arterial); margin-bottom: 20px; }
+        h1 { font-size: 1.1rem; letter-spacing: 6px; color: var(--arterial); text-transform: uppercase; text-shadow: 0 0 15px var(--arterial); }
+
+        /* Accordion Mobile */
+        .accordion {
+            width: 100%;
+            background: var(--glass);
+            border: 1px solid rgba(139, 0, 0, 0.2);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .acc-header { padding: 15px; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; display: flex; justify-content: space-between; cursor: pointer; }
+        .acc-content { max-height: 0; overflow: hidden; transition: 0.4s ease; padding: 0 15px; font-size: 0.8rem; color: #888; }
+        .accordion.active .acc-content { max-height: 150px; padding-bottom: 15px; }
+
+        /* Display Area */
+        #output {
+            width: 100%;
+            min-height: 180px;
+            background: linear-gradient(135deg, #000 0%, #050505 100%);
+            border: 1px solid var(--poison);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 30px rgba(75, 0, 130, 0.3);
+            position: relative;
+        }
+
+        /* Controls */
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn {
+            height: 65px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-main { grid-column: span 2; background: linear-gradient(45deg, var(--arterial), var(--poison)); color: white; }
+        .btn-copy { background: var(--bone); color: var(--abyss); }
+        .btn-save { background: transparent; border: 1px solid var(--arterial); color: var(--arterial); }
+        .btn:active { transform: scale(0.96); opacity: 0.8; }
+
+        /* Histórico */
+        .history-section { width: 100%; margin-top: 30px; }
+        .history-title { font-size: 0.7rem; text-transform: uppercase; color: #555; margin-bottom: 10px; letter-spacing: 2px; }
+        .history-item {
+            background: rgba(255,255,255,0.02);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            border-left: 2px solid var(--poison);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #status { font-size: 0.7rem; color: var(--poison); margin-top: 10px; min-height: 15px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Vortex Visceral</h1>
+</header>
+
+<div class="accordion" onclick="this.classList.toggle('active'); vib('light');">
+    <div class="acc-header">A Lógica do Abismo <span>▼</span></div>
+    <div class="acc-content">
+        Este sistema funde algoritmicamente a estética de Beksiński, Giger e o simbolismo das Pombagiras. Projetado para manifestações viscerais.
+    </div>
+</div>
+
+<div id="output">Toque em "Invocar" para iniciar a visão...</div>
+<div id="status"></div>
+
+<div class="grid-buttons">
+    <button class="btn btn-main" onclick="generateIntelligence()">Invocar Visão</button>
+    <button class="btn btn-copy" onclick="copyText()">Copiar</button>
+    <button class="btn btn-save" onclick="saveToSupabase()">Eternizar</button>
+</div>
+
+<div class="history-section">
+    <div class="history-title">Últimas Manifestações</div>
+    <div id="history-list">
+        </div>
+</div>
+
+<script>
+    // Configurações Supabase (Suas Chaves)
+    const SB_URL = "https://rbygxkbewzknvjjhxdvw.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJieWd4a2Jld3prbnZqamh4ZHZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMDcxNjQsImV4cCI6MjA4MTU4MzE2NH0.YrHF9HEGo6yv9MyNsPzFgBhaAB1DRh2SLU8f7L6s1nY";
+    const supabase = libsupabase.createClient(SB_URL, SB_KEY);
+
+    const Matriz = {
+        entidades: [
+            "A visceral Pombagira entity crowned in bone tridents", "A biomechanical oracle with obsidian tears",
+            "A skeletal figure draped in blood-red ritual silk", "An amorphous mass of distorted organic limbs",
+            "The cosmic shadow of a Libra queen", "A rusted mechanical deity of the abyss"
+        ],
+        cenarios: [
+            "in a desolate Beksiński gothic cathedral", "within a pulsating arterial womb-chamber",
+            "submerged in a poisonous purple mercury sea", "at the threshold of a David Lynch red void",
+            "amidst a Junji Ito inspired spiral of flesh"
+        ],
+        estilos: [
+            "Francis Bacon's raw body horror", "H.R. Giger's biomechanical precision",
+            "Zdzisław Beksiński's oniric surrealism", "Alexia Melusine's visceral mysticism",
+            "Clive Barker's ritualistic grotesque", "Jodorowsky's symbolic alchemy"
+        ]
+    };
+
+    function vib(s) {
+        if (navigator.vibrate) {
+            s === 'light' ? navigator.vibrate(30) : navigator.vibrate([40, 30, 40]);
+        }
+    }
+
+    function generateIntelligence() {
+        vib('heavy');
+        const ent = Matriz.entidades[Math.floor(Math.random() * Matriz.entidades.length)];
+        const cen = Matriz.cenarios[Math.floor(Math.random() * Matriz.cenarios.length)];
+        const est = Matriz.estilos[Math.floor(Math.random() * Matriz.estilos.length)];
+        
+        const prompt = `${ent}, ${cen}, in the style of ${est}, visceral atmosphere, cinematic lighting, hyper-detailed textures --v 6.0 --stylize 750`;
+        
+        document.getElementById('output').innerText = prompt;
+        document.getElementById('output').style.color = "#fff";
+    }
+
+    async function saveToSupabase() {
+        const text = document.getElementById('output').innerText;
+        if (text.includes("Toque em")) return;
+
+        vib('heavy');
+        document.getElementById('status').innerText = "Enviando ao banco de dados...";
+
+        const { error } = await supabase
+            .from('prompts_viscerais')
+            .insert([{ content: text, created_at: new Date() }]);
+
+        if (error) {
+            document.getElementById('status').innerText = "Erro ao salvar.";
+        } else {
+            document.getElementById('status').innerText = "Eternizado com sucesso!";
+            loadHistory();
+            setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
+        }
+    }
+
+    async function loadHistory() {
+        const { data, error } = await supabase
+            .from('prompts_viscerais')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(5);
+
+        if (data) {
+            const list = document.getElementById('history-list');
+            list.innerHTML = data.map(item => `
+                <div class="history-item">
+                    <span>${item.content.substring(0, 40)}...</span>
+                    <button style="background:none; border:none; color:var(--arterial); font-weight:bold;" onclick="copyDirect('${item.content.replace(/'/g, "\\'")}')">COPIAR</button>
+                </div>
+            `).join('');
+        }
+    }
+
+    function copyText() {
+        vib('light');
+        const text = document.getElementById('output').innerText;
+        navigator.clipboard.writeText(text);
+        document.getElementById('status').innerText = "Copiado para o seu plano.";
+        setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
+    }
+
+    function copyDirect(t) {
+        vib('light');
+        navigator.clipboard.writeText(t);
+        alert("Prompt do histórico copiado!");
+    }
+
+    // Inicialização
+    loadHistory();
+</script>
+
+</body>
+</html>
