@@ -7,6 +7,7 @@
     <title>Vortex Visceral | Oráculo de Alexia Melusine</title>
     
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/pombagiras/melusine/main/Al%C3%AA%20(3)%20(3)%20(1).png">
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -23,7 +24,7 @@
         body {
             background-color: var(--abyss);
             color: var(--bone);
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             padding: 15px;
             display: flex;
             flex-direction: column;
@@ -34,25 +35,10 @@
         header { width: 100%; text-align: center; padding: 20px 0; border-bottom: 1px solid var(--arterial); margin-bottom: 20px; }
         h1 { font-size: 1.1rem; letter-spacing: 6px; color: var(--arterial); text-transform: uppercase; text-shadow: 0 0 15px var(--arterial); }
 
-        /* Accordion Mobile */
-        .accordion {
-            width: 100%;
-            background: var(--glass);
-            border: 1px solid rgba(139, 0, 0, 0.2);
-            border-radius: 12px;
-            margin-bottom: 15px;
-            overflow: hidden;
-        }
-
-        .acc-header { padding: 15px; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; display: flex; justify-content: space-between; cursor: pointer; }
-        .acc-content { max-height: 0; overflow: hidden; transition: 0.4s ease; padding: 0 15px; font-size: 0.8rem; color: #888; }
-        .accordion.active .acc-content { max-height: 150px; padding-bottom: 15px; }
-
-        /* Display Area */
         #output {
             width: 100%;
             min-height: 180px;
-            background: linear-gradient(135deg, #000 0%, #050505 100%);
+            background: #000;
             border: 1px solid var(--poison);
             border-radius: 15px;
             padding: 20px;
@@ -64,158 +50,119 @@
             font-size: 0.95rem;
             margin-bottom: 20px;
             box-shadow: inset 0 0 30px rgba(75, 0, 130, 0.3);
-            position: relative;
         }
 
-        /* Controls */
-        .grid-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            width: 100%;
-        }
-
-        .btn {
-            height: 65px;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
+        .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+        .btn { height: 65px; border: none; border-radius: 12px; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
         .btn-main { grid-column: span 2; background: linear-gradient(45deg, var(--arterial), var(--poison)); color: white; }
         .btn-copy { background: var(--bone); color: var(--abyss); }
         .btn-save { background: transparent; border: 1px solid var(--arterial); color: var(--arterial); }
-        .btn:active { transform: scale(0.96); opacity: 0.8; }
+        .btn:active { transform: scale(0.95); }
+        
+        #status { font-size: 0.7rem; color: var(--poison); margin-top: 10px; height: 15px; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Histórico */
-        .history-section { width: 100%; margin-top: 30px; }
-        .history-title { font-size: 0.7rem; text-transform: uppercase; color: #555; margin-bottom: 10px; letter-spacing: 2px; }
-        .history-item {
-            background: rgba(255,255,255,0.02);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 0.75rem;
-            border-left: 2px solid var(--poison);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .history-section { width: 100%; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+        .history-item { 
+            background: rgba(255,255,255,0.02); 
+            padding: 12px; 
+            border-radius: 8px; 
+            margin-bottom: 8px; 
+            font-size: 0.7rem; 
+            border-left: 2px solid var(--poison); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
         }
 
-        #status { font-size: 0.7rem; color: var(--poison); margin-top: 10px; min-height: 15px; }
+        @keyframes flicker {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; text-shadow: 0 0 10px var(--arterial); }
+            100% { opacity: 0.9; }
+        }
+        .flicker { animation: flicker 0.1s infinite; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Vortex Visceral</h1>
-</header>
+<header><h1>Vortex Visceral</h1></header>
 
-<div class="accordion" onclick="this.classList.toggle('active'); vib('light');">
-    <div class="acc-header">A Lógica do Abismo <span>▼</span></div>
-    <div class="acc-content">
-        Este sistema funde algoritmicamente a estética de Beksiński, Giger e o simbolismo das Pombagiras. Projetado para manifestações viscerais.
-    </div>
-</div>
-
-<div id="output">Toque em "Invocar" para iniciar a visão...</div>
+<div id="output">O Vórtice aguarda sua intenção...</div>
 <div id="status"></div>
 
 <div class="grid-buttons">
-    <button class="btn btn-main" onclick="generateIntelligence()">Invocar Visão</button>
+    <button class="btn btn-main" onclick="generate()">Invocar Visão</button>
     <button class="btn btn-copy" onclick="copyText()">Copiar</button>
-    <button class="btn btn-save" onclick="saveToSupabase()">Eternizar</button>
+    <button class="btn btn-save" onclick="save()">Eternizar</button>
 </div>
 
 <div class="history-section">
-    <div class="history-title">Últimas Manifestações</div>
-    <div id="history-list">
-        </div>
+    <div id="history-list"></div>
 </div>
 
 <script>
-    // Configurações Supabase (Suas Chaves)
-    const SB_URL = "https://rbygxkbewzknvjjhxdvw.supabase.co";
-    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJieWd4a2Jld3prbnZqamh4ZHZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMDcxNjQsImV4cCI6MjA4MTU4MzE2NH0.YrHF9HEGo6yv9MyNsPzFgBhaAB1DRh2SLU8f7L6s1nY";
-    const supabase = libsupabase.createClient(SB_URL, SB_KEY);
+    const URL = "https://rbygxkbewzknvjjhxdvw.supabase.co";
+    const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJieWd4a2Jld3prbnZqamh4ZHZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMDcxNjQsImV4cCI6MjA4MTU4MzE2NH0.YrHF9HEGo6yv9MyNsPzFgBhaAB1DRh2SLU8f7L6s1nY";
+    
+    // CORREÇÃO: Acesso direto ao criador de cliente da v2
+    const supabaseClient = supabase.createClient(URL, KEY);
 
     const Matriz = {
-        entidades: [
-            "A visceral Pombagira entity crowned in bone tridents", "A biomechanical oracle with obsidian tears",
-            "A skeletal figure draped in blood-red ritual silk", "An amorphous mass of distorted organic limbs",
-            "The cosmic shadow of a Libra queen", "A rusted mechanical deity of the abyss"
-        ],
-        cenarios: [
-            "in a desolate Beksiński gothic cathedral", "within a pulsating arterial womb-chamber",
-            "submerged in a poisonous purple mercury sea", "at the threshold of a David Lynch red void",
-            "amidst a Junji Ito inspired spiral of flesh"
-        ],
-        estilos: [
-            "Francis Bacon's raw body horror", "H.R. Giger's biomechanical precision",
-            "Zdzisław Beksiński's oniric surrealism", "Alexia Melusine's visceral mysticism",
-            "Clive Barker's ritualistic grotesque", "Jodorowsky's symbolic alchemy"
-        ]
+        entidades: ["A visceral Pombagira entity", "A biomechanical oracle", "A skeletal figure in red silk", "A distorted cosmic presence"],
+        cenarios: ["in a gothic bone cathedral", "within an arterial womb", "in a poisonous purple sea", "at the red velvet void"],
+        estilos: ["Beksiński surrealism", "H.R. Giger horror", "Francis Bacon visceral art", "Alexia Melusine mysticism"]
     };
 
-    function vib(s) {
+    function vib(type) {
         if (navigator.vibrate) {
-            s === 'light' ? navigator.vibrate(30) : navigator.vibrate([40, 30, 40]);
+            type === 'light' ? navigator.vibrate(20) : navigator.vibrate([30, 20, 30]);
         }
     }
 
-    function generateIntelligence() {
+    function generate() {
         vib('heavy');
-        const ent = Matriz.entidades[Math.floor(Math.random() * Matriz.entidades.length)];
-        const cen = Matriz.cenarios[Math.floor(Math.random() * Matriz.cenarios.length)];
-        const est = Matriz.estilos[Math.floor(Math.random() * Matriz.estilos.length)];
+        const out = document.getElementById('output');
+        out.classList.add('flicker');
         
-        const prompt = `${ent}, ${cen}, in the style of ${est}, visceral atmosphere, cinematic lighting, hyper-detailed textures --v 6.0 --stylize 750`;
+        const res = `${Matriz.entidades[Math.floor(Math.random()*4)]}, ${Matriz.cenarios[Math.floor(Math.random()*4)]}, style of ${Matriz.estilos[Math.floor(Math.random()*4)]}, visceral, 8k --v 6.0`;
         
-        document.getElementById('output').innerText = prompt;
-        document.getElementById('output').style.color = "#fff";
+        setTimeout(() => {
+            out.innerText = res;
+            out.classList.remove('flicker');
+        }, 2000); // 2 segundos de "transmissão" do abismo
     }
 
-    async function saveToSupabase() {
-        const text = document.getElementById('output').innerText;
-        if (text.includes("Toque em")) return;
-
+    async function save() {
+        const content = document.getElementById('output').innerText;
+        if (content.includes("aguarda")) return;
+        
         vib('heavy');
-        document.getElementById('status').innerText = "Enviando ao banco de dados...";
+        document.getElementById('status').innerText = "Manifestando no banco...";
 
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('prompts_viscerais')
-            .insert([{ content: text, created_at: new Date() }]);
+            .insert([{ content: content }]);
 
         if (error) {
-            document.getElementById('status').innerText = "Erro ao salvar.";
+            document.getElementById('status').innerText = "Falha no portal.";
+            console.error(error);
         } else {
-            document.getElementById('status').innerText = "Eternizado com sucesso!";
-            loadHistory();
-            setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
+            document.getElementById('status').innerText = "Eternizado!";
+            load();
         }
     }
 
-    async function loadHistory() {
-        const { data, error } = await supabase
+    async function load() {
+        const { data } = await supabaseClient
             .from('prompts_viscerais')
             .select('*')
             .order('created_at', { ascending: false })
             .limit(5);
 
         if (data) {
-            const list = document.getElementById('history-list');
-            list.innerHTML = data.map(item => `
+            document.getElementById('history-list').innerHTML = data.map(i => `
                 <div class="history-item">
-                    <span>${item.content.substring(0, 40)}...</span>
-                    <button style="background:none; border:none; color:var(--arterial); font-weight:bold;" onclick="copyDirect('${item.content.replace(/'/g, "\\'")}')">COPIAR</button>
+                    <span>${i.content.substring(0, 25)}...</span>
+                    <button style="background:none; border:none; color:var(--arterial); font-weight:bold; font-size:0.6rem;" onclick="navigator.clipboard.writeText('${i.content}'); alert('Copiado!')">COPIAR</button>
                 </div>
             `).join('');
         }
@@ -223,20 +170,13 @@
 
     function copyText() {
         vib('light');
-        const text = document.getElementById('output').innerText;
-        navigator.clipboard.writeText(text);
-        document.getElementById('status').innerText = "Copiado para o seu plano.";
-        setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
+        navigator.clipboard.writeText(document.getElementById('output').innerText);
+        document.getElementById('status').innerText = "Copiado!";
+        setTimeout(() => document.getElementById('status').innerText = "", 2000);
     }
 
-    function copyDirect(t) {
-        vib('light');
-        navigator.clipboard.writeText(t);
-        alert("Prompt do histórico copiado!");
-    }
-
-    // Inicialização
-    loadHistory();
+    // Carregar histórico ao iniciar
+    window.onload = load;
 </script>
 
 </body>
