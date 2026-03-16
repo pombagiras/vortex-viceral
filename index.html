@@ -4,112 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#030303">
-    <title>Vortex Visceral | Oráculo de Alexia Melusine</title>
-    
+    <title>Vortex Visceral | Reboot</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/pombagiras/melusine/main/Al%C3%AA%20(3)%20(3)%20(1).png">
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --abyss: #030303;
-            --arterial: #8b0000;
-            --poison: #4b0082;
-            --bone: #e0d7c6;
-            --glass: rgba(255, 255, 255, 0.05);
-        }
-
+        :root { --abyss: #030303; --arterial: #8b0000; --poison: #4b0082; --bone: #e0d7c6; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            background-color: var(--abyss);
-            color: var(--bone);
-            font-family: 'Segoe UI', sans-serif;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            align-items: center;
-        }
-
+        body { background: var(--abyss); color: var(--bone); font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
         header { width: 100%; text-align: center; padding: 20px 0; border-bottom: 1px solid var(--arterial); margin-bottom: 20px; }
-        h1 { font-size: 1.1rem; letter-spacing: 6px; color: var(--arterial); text-transform: uppercase; text-shadow: 0 0 15px var(--arterial); }
+        h1 { font-size: 1.1rem; letter-spacing: 5px; color: var(--arterial); text-transform: uppercase; }
 
         #output {
-            width: 100%;
-            min-height: 180px;
-            background: #000;
-            border: 1px solid var(--poison);
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-            box-shadow: inset 0 0 30px rgba(75, 0, 130, 0.3);
+            width: 100%; min-height: 160px; background: #000; border: 1px solid var(--poison);
+            border-radius: 15px; padding: 20px; display: flex; align-items: center; justify-content: center;
+            text-align: center; font-family: 'Courier New', monospace; font-size: 1rem; margin-bottom: 20px;
+            box-shadow: inset 0 0 20px rgba(75,0,130,0.3); transition: 0.3s;
         }
 
-        .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
-        .btn { height: 65px; border: none; border-radius: 12px; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
-        .btn-main { grid-column: span 2; background: linear-gradient(45deg, var(--arterial), var(--poison)); color: white; }
-        .btn-copy { background: var(--bone); color: var(--abyss); }
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+        .btn { height: 65px; border: none; border-radius: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.8rem; }
+        .btn-main { grid-column: span 2; background: linear-gradient(45deg, var(--arterial), var(--poison)); color: #fff; }
+        .btn-sec { background: var(--bone); color: #000; }
         .btn-save { background: transparent; border: 1px solid var(--arterial); color: var(--arterial); }
-        .btn:active { transform: scale(0.95); }
+
+        #status { margin-top: 15px; font-size: 0.7rem; color: var(--poison); text-transform: uppercase; height: 15px; letter-spacing: 1px; }
         
-        #status { font-size: 0.7rem; color: var(--poison); margin-top: 10px; height: 15px; text-transform: uppercase; letter-spacing: 1px; }
-
-        .history-section { width: 100%; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-        .history-item { 
-            background: rgba(255,255,255,0.02); 
-            padding: 12px; 
-            border-radius: 8px; 
-            margin-bottom: 8px; 
-            font-size: 0.7rem; 
-            border-left: 2px solid var(--poison); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-
-        @keyframes flicker {
-            0% { opacity: 0.8; }
-            50% { opacity: 1; text-shadow: 0 0 10px var(--arterial); }
-            100% { opacity: 0.9; }
-        }
-        .flicker { animation: flicker 0.1s infinite; }
+        .history { width: 100%; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+        .h-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.7rem; display: flex; justify-content: space-between; align-items: center; border-left: 2px solid var(--arterial); }
     </style>
 </head>
 <body>
 
 <header><h1>Vortex Visceral</h1></header>
 
-<div id="output">O Vórtice aguarda sua intenção...</div>
-<div id="status"></div>
+<div id="output">Toque abaixo para invocar...</div>
+<div id="status">SISTEMA ONLINE</div>
 
-<div class="grid-buttons">
+<div class="controls">
     <button class="btn btn-main" onclick="generate()">Invocar Visão</button>
-    <button class="btn btn-copy" onclick="copyText()">Copiar</button>
-    <button class="btn btn-save" onclick="save()">Eternizar</button>
+    <button class="btn btn-sec" onclick="copyText()">Copiar</button>
+    <button class="btn btn-save" onclick="saveToAbyss()">Eternizar</button>
 </div>
 
-<div class="history-section">
-    <div id="history-list"></div>
-</div>
+<div class="history" id="history-list"></div>
 
 <script>
-    const URL = "https://rbygxkbewzknvjjhxdvw.supabase.co";
-    const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJieWd4a2Jld3prbnZqamh4ZHZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMDcxNjQsImV4cCI6MjA4MTU4MzE2NH0.YrHF9HEGo6yv9MyNsPzFgBhaAB1DRh2SLU8f7L6s1nY";
+    // Configurações Supabase
+    const S_URL = "https://rbygxkbewzknvjjhxdvw.supabase.co";
+    const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJieWd4a2Jld3prbnZqamh4ZHZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMDcxNjQsImV4cCI6MjA4MTU4MzE2NH0.YrHF9HEGo6yv9MyNsPzFgBhaAB1DRh2SLU8f7L6s1nY";
     
-    // CORREÇÃO: Acesso direto ao criador de cliente da v2
-    const supabaseClient = supabase.createClient(URL, KEY);
+    let supabaseClient = null;
+
+    // Inicialização assíncrona para não travar o clique dos botões
+    function initSupabase() {
+        try {
+            if (window.supabase) {
+                supabaseClient = window.supabase.createClient(S_URL, S_KEY);
+                loadHistory();
+            }
+        } catch (e) {
+            console.error("Erro Supabase:", e);
+        }
+    }
 
     const Matriz = {
-        entidades: ["A visceral Pombagira entity", "A biomechanical oracle", "A skeletal figure in red silk", "A distorted cosmic presence"],
-        cenarios: ["in a gothic bone cathedral", "within an arterial womb", "in a poisonous purple sea", "at the red velvet void"],
-        estilos: ["Beksiński surrealism", "H.R. Giger horror", "Francis Bacon visceral art", "Alexia Melusine mysticism"]
+        ent: ["A visceral Pombagira entity", "A biomechanical oracle", "A skeletal figure in red silk", "A distorted cosmic presence"],
+        cen: ["in a bone cathedral", "within an arterial womb", "in a poisonous purple sea", "at the red velvet void"],
+        est: ["Beksiński surrealism", "H.R. Giger horror", "Francis Bacon visceral art", "Alexia Melusine mysticism"]
     };
 
     function vib(type) {
@@ -118,66 +82,65 @@
         }
     }
 
+    // Função de Gerar: Agora é a primeira e mais simples
     function generate() {
         vib('heavy');
-        const out = document.getElementById('output');
-        out.classList.add('flicker');
+        const e = Matriz.ent[Math.floor(Math.random() * 4)];
+        const c = Matriz.cen[Math.floor(Math.random() * 4)];
+        const s = Matriz.est[Math.floor(Math.random() * 4)];
         
-        const res = `${Matriz.entidades[Math.floor(Math.random()*4)]}, ${Matriz.cenarios[Math.floor(Math.random()*4)]}, style of ${Matriz.estilos[Math.floor(Math.random()*4)]}, visceral, 8k --v 6.0`;
-        
-        setTimeout(() => {
-            out.innerText = res;
-            out.classList.remove('flicker');
-        }, 2000); // 2 segundos de "transmissão" do abismo
+        const res = `${e}, ${c}, style of ${s}, visceral atmosphere, 8k --v 6.0`;
+        document.getElementById('output').innerText = res;
+        document.getElementById('status').innerText = "VISÃO MANIFESTADA";
     }
 
-    async function save() {
-        const content = document.getElementById('output').innerText;
-        if (content.includes("aguarda")) return;
-        
-        vib('heavy');
-        document.getElementById('status').innerText = "Manifestando no banco...";
+    function copyText() {
+        vib('light');
+        const text = document.getElementById('output').innerText;
+        if (text.includes("Toque")) return;
+        navigator.clipboard.writeText(text);
+        document.getElementById('status').innerText = "COPIADO PARA O PLANO FÍSICO";
+    }
 
-        const { error } = await supabaseClient
-            .from('prompts_viscerais')
-            .insert([{ content: content }]);
+    async function saveToAbyss() {
+        const text = document.getElementById('output').innerText;
+        if (text.includes("Toque")) return;
+        vib('heavy');
+
+        if (!supabaseClient) {
+            initSupabase(); // Tenta reconectar se falhou antes
+            if (!supabaseClient) {
+                document.getElementById('status').innerText = "ERRO: PORTAL SUPABASE OFFLINE";
+                return;
+            }
+        }
+
+        document.getElementById('status').innerText = "ETERNIZANDO...";
+        const { error } = await supabaseClient.from('prompts_viscerais').insert([{ content: text }]);
 
         if (error) {
-            document.getElementById('status').innerText = "Falha no portal.";
-            console.error(error);
+            document.getElementById('status').innerText = "ERRO NA TABELA";
         } else {
-            document.getElementById('status').innerText = "Eternizado!";
-            load();
+            document.getElementById('status').innerText = "ETERNIZADO COM SUCESSO";
+            loadHistory();
         }
     }
 
-    async function load() {
-        const { data } = await supabaseClient
-            .from('prompts_viscerais')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(5);
-
+    async function loadHistory() {
+        if (!supabaseClient) return;
+        const { data } = await supabaseClient.from('prompts_viscerais').select('*').order('created_at', { ascending: false }).limit(5);
         if (data) {
             document.getElementById('history-list').innerHTML = data.map(i => `
-                <div class="history-item">
+                <div class="h-item">
                     <span>${i.content.substring(0, 25)}...</span>
-                    <button style="background:none; border:none; color:var(--arterial); font-weight:bold; font-size:0.6rem;" onclick="navigator.clipboard.writeText('${i.content}'); alert('Copiado!')">COPIAR</button>
+                    <button style="background:none; border:none; color:var(--arterial); font-weight:bold; font-size:0.6rem;" onclick="navigator.clipboard.writeText('${i.content.replace(/'/g, "\\'")}'); alert('Copiado!')">COPIAR</button>
                 </div>
             `).join('');
         }
     }
 
-    function copyText() {
-        vib('light');
-        navigator.clipboard.writeText(document.getElementById('output').innerText);
-        document.getElementById('status').innerText = "Copiado!";
-        setTimeout(() => document.getElementById('status').innerText = "", 2000);
-    }
-
-    // Carregar histórico ao iniciar
-    window.onload = load;
+    // Tenta carregar o banco após 1 segundo
+    setTimeout(initSupabase, 1000);
 </script>
-
 </body>
 </html>
