@@ -1,4 +1,4 @@
-# 🌑 Vortex Visceral 2026
+# 🌑 Vortex Visceral
 
 > "Onde a carne encontra o código e o abismo manifesta a visão."
 
